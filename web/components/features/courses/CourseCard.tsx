@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { Users, DollarSign, BookOpen, BarChart2, Edit, Trash2 } from "lucide-react";
+import { Users, DollarSign, BookOpen, BarChart2, Edit, Trash2, Copy, Check } from "lucide-react";
 import { useMutation } from "convex/react";
 import { api } from "@convex/_generated/api";
 import type { Id } from "@convex/_generated/dataModel";
+import { useState } from "react";
 
 interface Props {
   id: string;
@@ -14,6 +15,8 @@ interface Props {
   totalRevenueCents: number;
   priceCents: number;
   coverImageUrl?: string;
+  slug?: string;
+  mentorSlug?: string;
 }
 
 const statusStyles = {
@@ -22,8 +25,17 @@ const statusStyles = {
   archived: "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400",
 };
 
-export function CourseCard({ id, title, status, enrollmentCount, totalRevenueCents, priceCents, coverImageUrl }: Props) {
+export function CourseCard({ id, title, status, enrollmentCount, totalRevenueCents, priceCents, coverImageUrl, slug, mentorSlug }: Props) {
   const removeCourse = useMutation(api.courses.remove);
+  const [copied, setCopied] = useState(false);
+
+  function copyLink() {
+    if (!slug || !mentorSlug) return;
+    const url = `https://www.masterminding.app/${mentorSlug}/${slug}`;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
 
   async function handleDelete() {
     if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
@@ -60,6 +72,16 @@ export function CourseCard({ id, title, status, enrollmentCount, totalRevenueCen
             ${(totalRevenueCents / 100).toFixed(0)} earned
           </span>
         </div>
+
+        {status === "published" && slug && mentorSlug && (
+          <button
+            onClick={copyLink}
+            className="w-full flex items-center justify-center gap-1.5 text-xs font-medium bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400 border border-teal-200 dark:border-teal-800 py-2 rounded-lg hover:bg-teal-100 dark:hover:bg-teal-900/40 transition-colors mb-2"
+          >
+            {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? "Link copied!" : "Copy student link"}
+          </button>
+        )}
 
         <div className="flex gap-2">
           <Link

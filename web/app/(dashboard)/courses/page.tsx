@@ -8,6 +8,7 @@ import { CourseCard } from "@/components/features/courses/CourseCard";
 
 export default function CoursesPage() {
   const courses = useQuery(api.courses.listByMentor);
+  const mentor = useQuery(api.mentors.getMe);
 
   return (
     <div className="max-w-5xl mx-auto py-10 px-6">
@@ -62,6 +63,8 @@ export default function CoursesPage() {
               totalRevenueCents={course.totalRevenueCents}
               priceCents={course.priceCents}
               coverImageUrl={course.coverImageUrl}
+              slug={course.slug}
+              mentorSlug={mentor?.slug}
             />
           ))}
         </div>
