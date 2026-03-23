@@ -13,7 +13,9 @@ import {
   Sun,
   Moon,
   TrendingUp,
+  X,
 } from "lucide-react";
+import { useSidebar } from "./SidebarContext";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -27,15 +29,27 @@ export function Sidebar() {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { open, close } = useSidebar();
 
   useEffect(() => setMounted(true), []);
+
+  // Close sidebar on route change (mobile)
+  useEffect(() => { close(); }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const isDark = theme === "dark";
 
   return (
-    <aside className="w-60 shrink-0 h-screen sticky top-0 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col">
+    <aside
+      className={[
+        "fixed inset-y-0 left-0 z-50 w-60 shrink-0 h-screen",
+        "md:relative md:z-auto md:translate-x-0",
+        "bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800",
+        "flex flex-col transition-transform duration-300 ease-in-out",
+        open ? "translate-x-0" : "-translate-x-full md:translate-x-0",
+      ].join(" ")}
+    >
       {/* Logo */}
-      <div className="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-800">
+      <div className="h-16 flex items-center justify-between px-6 border-b border-slate-200 dark:border-slate-800">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-[#0F766E] flex items-center justify-center">
             <GraduationCap className="w-5 h-5 text-white" />
@@ -44,6 +58,13 @@ export function Sidebar() {
             MasterMinding
           </span>
         </div>
+        {/* Close button — mobile only */}
+        <button
+          onClick={close}
+          className="md:hidden p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400"
+        >
+          <X className="w-4 h-4" />
+        </button>
       </div>
 
       {/* Navigation */}

@@ -20,7 +20,7 @@ export default function DashboardPage() {
   return (
     <>
       <Header title="Dashboard" />
-      <div className="p-6 max-w-5xl mx-auto">
+      <div className="p-4 md:p-6 max-w-5xl mx-auto">
         {mentor?.subscriptionStatus === "past_due" && (
           <SubscriptionBanner status="past_due" />
         )}
@@ -35,7 +35,7 @@ export default function DashboardPage() {
         ) : (
           <>
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
               <StatCard
                 label="Total enrollments"
                 value={stats?.totalEnrollments ?? 0}
