@@ -12,7 +12,17 @@ export function Header({ title }: HeaderProps) {
       <h1 className="text-base font-semibold text-slate-900 dark:text-white">
         {title ?? "Dashboard"}
       </h1>
-      <UserButton afterSignOutUrl="/sign-in" />
+      <UserButton
+        afterSignOutUrl="/sign-in"
+        userProfileProps={{
+          appearance: {
+            elements: {
+              profileSection__activeDevices: { display: "none" },
+              profileSection__danger: { display: "none" },
+            },
+          },
+        }}
+      />
     </header>
   );
 }
