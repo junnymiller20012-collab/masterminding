@@ -28,6 +28,11 @@
     "stripe": "^20.4.1",
     "zod": "^3.25.76"
   },
+  "optionalDependencies": {
+    "lightningcss-linux-x64-gnu": "*",
+    "lightningcss-darwin-x64": "*",
+    "lightningcss-win32-x64-msvc": "*"
+  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
