@@ -28,7 +28,7 @@ export default function PayoutsPage() {
 
   return (
     <div className="max-w-2xl mx-auto py-10 px-6">
-      <h1 className="text-2xl font-bold text-slate-900 mb-8">Payouts</h1>
+      <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-8">Payouts</h1>
 
       {justConnected && (
         <div className="bg-teal-50 border border-teal-200 text-teal-700 text-sm px-4 py-3 rounded-lg mb-6 flex items-center gap-2">
@@ -37,11 +37,11 @@ export default function PayoutsPage() {
         </div>
       )}
 
-      <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-5">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 space-y-5">
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-semibold text-slate-800">Stripe Connect Account</p>
-            <p className="text-sm text-slate-500 mt-0.5">Receive automatic payouts after each sale</p>
+            <p className="font-semibold text-slate-800 dark:text-white">Stripe Connect Account</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Receive automatic payouts after each sale</p>
           </div>
           {isConnected ? (
             <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-teal-100 text-teal-700">
@@ -59,16 +59,16 @@ export default function PayoutsPage() {
         </div>
 
         {mentor && (
-          <div className="bg-slate-50 rounded-lg p-4">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">Lifetime Earnings</p>
-            <p className="text-3xl font-bold text-slate-900">
+          <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4">
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-3">Lifetime Earnings</p>
+            <p className="text-3xl font-bold text-slate-900 dark:text-white">
               ${((mentor as any).totalRevenueCents ?? 0 / 100).toFixed(2)}
             </p>
             <p className="text-xs text-slate-400 mt-1">After 10% platform fee</p>
           </div>
         )}
 
-        <div className="pt-2 border-t border-slate-100">
+        <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
           {isConnected ? (
             <a
               href="https://dashboard.stripe.com/express"

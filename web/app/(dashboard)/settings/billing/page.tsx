@@ -55,13 +55,13 @@ export default function BillingPage() {
 
   return (
     <div className="max-w-2xl mx-auto py-10 px-6">
-      <h1 className="text-2xl font-bold text-slate-900 mb-8">Billing</h1>
+      <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-8">Billing</h1>
 
-      <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-5">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 space-y-5">
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-semibold text-slate-800">MasterMinding Subscription</p>
-            <p className="text-sm text-slate-500 mt-0.5">$29/month + 10% per course sale</p>
+            <p className="font-semibold text-slate-800 dark:text-white">MasterMinding Subscription</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">$29/month + 10% per course sale</p>
           </div>
           <StatusBadge status={mentor?.subscriptionStatus} />
         </div>
@@ -75,7 +75,7 @@ export default function BillingPage() {
           </p>
         )}
 
-        <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+        <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
           <CreditCard className="w-4 h-4 text-slate-400" />
           {isActive ? (
             <button
