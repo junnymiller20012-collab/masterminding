@@ -7,7 +7,7 @@ import { z } from "zod";
 import { useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
-import { api } from "@/convex/_generated/api";
+import { api } from "@convex/_generated/api";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 

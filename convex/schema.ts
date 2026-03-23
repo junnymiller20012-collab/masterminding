@@ -67,8 +67,13 @@ export default defineSchema({
       v.literal("published"),
       v.literal("archived")
     ),
+    // Course details
+    targetAudience: v.optional(v.string()),
+    outcomes: v.optional(v.array(v.string())),
+    publishedAt: v.optional(v.number()),
     // AI-generated sales page
     salesPageHeadline: v.optional(v.string()),
+    salesPageSubheadline: v.optional(v.string()),
     salesPageBody: v.optional(v.string()),
     salesPageGenerated: v.optional(v.boolean()),
     // Stats (denormalized for performance)

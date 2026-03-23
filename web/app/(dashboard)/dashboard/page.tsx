@@ -1,11 +1,12 @@
 "use client";
 
 import { useQuery } from "convex/react";
-import { api } from "@/convex/_generated/api";
+import { api } from "@convex/_generated/api";
 import { Header } from "@/components/features/dashboard/Header";
 import { StatCard } from "@/components/features/dashboard/StatCard";
 import { ActivityFeed } from "@/components/features/dashboard/ActivityFeed";
 import { EmptyState } from "@/components/features/dashboard/EmptyState";
+import { SubscriptionBanner } from "@/components/features/dashboard/SubscriptionBanner";
 import { Card } from "@/components/ui/Card";
 import { useUser } from "@clerk/nextjs";
 
@@ -20,6 +21,15 @@ export default function DashboardPage() {
     <>
       <Header title="Dashboard" />
       <div className="p-6 max-w-5xl mx-auto">
+        {mentor?.subscriptionStatus === "past_due" && (
+          <SubscriptionBanner status="past_due" />
+        )}
+        {mentor?.subscriptionStatus === "canceled" && (
+          <SubscriptionBanner status="canceled" />
+        )}
+        {!mentor?.subscriptionStatus && mentor && (
+          <SubscriptionBanner status="inactive" />
+        )}
         {isNew || !mentor ? (
           <EmptyState name={user?.firstName ?? undefined} />
         ) : (
@@ -42,7 +52,7 @@ export default function DashboardPage() {
 
             {/* Recent activity */}
             <Card>
-              <h2 className="text-sm font-semibold text-slate-900 mb-4">
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">
                 Recent enrollments
               </h2>
               <ActivityFeed

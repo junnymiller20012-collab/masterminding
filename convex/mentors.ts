@@ -160,6 +160,104 @@ export const getDashboard = query({
   },
 });
 
+// Get mentor by Clerk ID (used by server API routes)
+export const getByClerkId = query({
+  args: { clerkId: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("mentors")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
+      .unique();
+  },
+});
+
+// Update Stripe account by Clerk ID (used by Connect callback)
+export const updateStripeAccountByClerkId = mutation({
+  args: {
+    clerkId: v.string(),
+    stripeAccountId: v.string(),
+    stripeAccountStatus: v.union(
+      v.literal("pending"),
+      v.literal("active"),
+      v.literal("restricted")
+    ),
+  },
+  handler: async (ctx, args) => {
+    const mentor = await ctx.db
+      .query("mentors")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
+      .unique();
+    if (!mentor) throw new Error("Mentor not found");
+    await ctx.db.patch(mentor._id, {
+      stripeAccountId: args.stripeAccountId,
+      stripeAccountStatus: args.stripeAccountStatus,
+      updatedAt: Date.now(),
+    });
+  },
+});
+
+// Get mentor by ID (internal use)
+export const getById = query({
+  args: { mentorId: v.id("mentors") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.mentorId);
+  },
+});
+
+// Update subscription status (called by webhook)
+export const updateSubscription = mutation({
+  args: {
+    stripeCustomerId: v.string(),
+    subscriptionId: v.string(),
+    subscriptionStatus: v.union(
+      v.literal("active"),
+      v.literal("trialing"),
+      v.literal("past_due"),
+      v.literal("canceled"),
+      v.literal("incomplete")
+    ),
+    subscriptionCurrentPeriodEnd: v.number(),
+  },
+  handler: async (ctx, args) => {
+    const mentor = await ctx.db
+      .query("mentors")
+      .withIndex("by_stripe_customer_id", (q) => q.eq("stripeCustomerId", args.stripeCustomerId))
+      .unique();
+    if (!mentor) return;
+    await ctx.db.patch(mentor._id, {
+      subscriptionId: args.subscriptionId,
+      subscriptionStatus: args.subscriptionStatus,
+      subscriptionCurrentPeriodEnd: args.subscriptionCurrentPeriodEnd,
+      updatedAt: Date.now(),
+    });
+  },
+});
+
+// Update mentor profile
+export const updateProfile = mutation({
+  args: {
+    name: v.optional(v.string()),
+    bio: v.optional(v.string()),
+    expertise: v.optional(v.string()),
+    avatarUrl: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+    const mentor = await ctx.db
+      .query("mentors")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .unique();
+    if (!mentor) throw new Error("Mentor not found");
+    const updates: Record<string, any> = { updatedAt: Date.now() };
+    if (args.name !== undefined) updates.name = args.name;
+    if (args.bio !== undefined) updates.bio = args.bio;
+    if (args.expertise !== undefined) updates.expertise = args.expertise;
+    if (args.avatarUrl !== undefined) updates.avatarUrl = args.avatarUrl;
+    await ctx.db.patch(mentor._id, updates);
+  },
+});
+
 // Update Stripe account info after Connect onboarding
 export const updateStripeAccount = mutation({
   args: {

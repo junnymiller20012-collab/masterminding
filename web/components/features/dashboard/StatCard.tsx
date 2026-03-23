@@ -7,9 +7,9 @@ interface StatCardProps {
 
 export function StatCard({ label, value, trend, trendUp }: StatCardProps) {
   return (
-    <div className="bg-white border border-slate-200 rounded-lg p-5 shadow-sm">
-      <p className="text-sm text-slate-500 font-medium">{label}</p>
-      <p className="text-2xl font-bold text-slate-900 mt-1">{value}</p>
+    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-5 shadow-sm">
+      <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">{label}</p>
+      <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">{value}</p>
       {trend && (
         <p
           className={[

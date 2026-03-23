@@ -18,12 +18,12 @@ export function ActivityFeed({ enrollments }: { enrollments: Enrollment[] }) {
   }
 
   return (
-    <div className="divide-y divide-slate-100">
+    <div className="divide-y divide-slate-100 dark:divide-slate-800">
       {enrollments.map((e) => (
         <div key={e.id} className="flex items-center justify-between py-3">
           <div>
-            <p className="text-sm font-medium text-slate-900">{e.learnerName}</p>
-            <p className="text-xs text-slate-500">{e.courseTitle}</p>
+            <p className="text-sm font-medium text-slate-900 dark:text-white">{e.learnerName}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">{e.courseTitle}</p>
           </div>
           <div className="text-right">
             <p className="text-sm font-semibold text-emerald-600">

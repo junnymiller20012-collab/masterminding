@@ -1,5 +1,7 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* ── Design Tokens ──────────────────────────────────────── */
 :root {
@@ -62,6 +64,15 @@
   --transition-slow: 300ms;
 }
 
+/* ── Dark Mode Tokens ────────────────────────────────────── */
+.dark {
+  --color-background: #0F172A;
+  --color-surface: #1E293B;
+  --color-border: #334155;
+  --color-text: #F1F5F9;
+  --color-text-muted: #94A3B8;
+}
+
 /* ── Tailwind v4 Theme ───────────────────────────────────── */
 @theme inline {
   --color-background: var(--color-background);
@@ -82,37 +93,42 @@
 }
 
 /* ── Base Styles ─────────────────────────────────────────── */
-*, *::before, *::after {
-  box-sizing: border-box;
-}
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
 
-html {
-  height: 100%;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  html {
+    height: 100%;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-body {
-  height: 100%;
-  background-color: var(--color-background);
-  color: var(--color-text);
-  font-family: var(--font-body);
-  font-size: var(--text-base);
-  line-height: var(--leading-normal);
-}
+  body {
+    height: 100%;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+  }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
-  font-weight: 600;
-  line-height: var(--leading-tight);
-  color: var(--color-text);
-}
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    line-height: var(--leading-tight);
+    color: var(--color-text);
+  }
 
-a {
-  color: var(--color-primary);
-  text-decoration: none;
-}
+  a {
+    text-decoration: none;
+  }
 
-a:hover {
-  color: var(--color-primary-hover);
+  a:not([class]) {
+    color: var(--color-primary);
+  }
+
+  a:not([class]):hover {
+    color: var(--color-primary-hover);
+  }
 }

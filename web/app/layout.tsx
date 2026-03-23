@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ConvexClientProvider } from "./ConvexClientProvider";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,9 +17,11 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="en" className="h-full">
+      <html lang="en" className="h-full" suppressHydrationWarning>
         <body className="h-full antialiased">
-          <ConvexClientProvider>{children}</ConvexClientProvider>
+          <ThemeProvider>
+            <ConvexClientProvider>{children}</ConvexClientProvider>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>
