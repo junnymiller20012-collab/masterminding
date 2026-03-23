@@ -145,6 +145,14 @@ export default defineSchema({
     .index("by_enrollment_id", ["enrollmentId"])
     .index("by_learner_course", ["learnerId", "courseId"]),
 
+  // ── Mentor Milestones ────────────────────────────────────
+  mentorMilestones: defineTable({
+    mentorId: v.id("mentors"),
+    manualChecks: v.array(v.string()), // milestone IDs the mentor manually checked
+    aiTips: v.optional(v.any()),       // { milestoneId: string }
+    updatedAt: v.number(),
+  }).index("by_mentor_id", ["mentorId"]),
+
   // ── Payments ─────────────────────────────────────────────
   payments: defineTable({
     enrollmentId: v.optional(v.id("enrollments")),

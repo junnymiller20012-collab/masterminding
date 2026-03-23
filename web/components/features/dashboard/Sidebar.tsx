@@ -12,12 +12,14 @@ import {
   GraduationCap,
   Sun,
   Moon,
+  TrendingUp,
 } from "lucide-react";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/courses", label: "Courses", icon: BookOpen },
   { href: "/students", label: "Students", icon: Users },
+  { href: "/growth", label: "Growth", icon: TrendingUp },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
