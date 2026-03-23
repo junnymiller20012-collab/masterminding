@@ -15,7 +15,7 @@ export function EmptyState({ name }: { name?: string }) {
         You're all set up. Create your first course and get your sales page live
         in under 30 minutes.
       </p>
-      <Link href="/dashboard/courses/new">
+      <Link href="/courses/new">
         <Button>Create your first course</Button>
       </Link>
     </div>
