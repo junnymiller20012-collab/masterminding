@@ -84,7 +84,7 @@ export default function NewCoursePage() {
             </div>
             <span
               className={`text-sm font-medium ${
-                i === step ? "text-slate-900" : "text-slate-400"
+                i === step ? "text-slate-900 dark:text-white" : "text-slate-400"
               }`}
             >
               {label}
@@ -94,8 +94,8 @@ export default function NewCoursePage() {
         ))}
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-xl p-8">
-        <h1 className="text-xl font-bold text-slate-900 mb-6">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-8">
+        <h1 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
           {step === 0 && "Tell us about your course"}
           {step === 1 && "Add your course content"}
           {step === 2 && "Set your price"}
@@ -131,7 +131,7 @@ export default function NewCoursePage() {
       </div>
 
       {isGenerating && (
-        <div className="fixed inset-0 bg-white/90 flex flex-col items-center justify-center z-50">
+        <div className="fixed inset-0 bg-white/90 dark:bg-slate-900/90 flex flex-col items-center justify-center z-50">
           <div className="w-12 h-12 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin mb-4" />
           <p className="text-lg font-semibold text-slate-800">Generating your sales page...</p>
           <p className="text-sm text-slate-500 mt-1">This takes about 10 seconds</p>
