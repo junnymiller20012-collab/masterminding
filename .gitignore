@@ -15,8 +15,7 @@ mobile/web-build/
 mobile/android/
 mobile/ios/
 
-# Convex
-convex/_generated/
+# Convex - _generated is committed so Vercel build can find it
 
 # Environment variables (keep .env.example tracked)
 .env
