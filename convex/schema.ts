@@ -67,8 +67,13 @@ export default defineSchema({
       v.literal("published"),
       v.literal("archived")
     ),
+    // Course details
+    targetAudience: v.optional(v.string()),
+    outcomes: v.optional(v.array(v.string())),
+    publishedAt: v.optional(v.number()),
     // AI-generated sales page
     salesPageHeadline: v.optional(v.string()),
+    salesPageSubheadline: v.optional(v.string()),
     salesPageBody: v.optional(v.string()),
     salesPageGenerated: v.optional(v.boolean()),
     // Stats (denormalized for performance)
@@ -139,6 +144,14 @@ export default defineSchema({
   })
     .index("by_enrollment_id", ["enrollmentId"])
     .index("by_learner_course", ["learnerId", "courseId"]),
+
+  // ── Mentor Milestones ────────────────────────────────────
+  mentorMilestones: defineTable({
+    mentorId: v.id("mentors"),
+    manualChecks: v.array(v.string()), // milestone IDs the mentor manually checked
+    aiTips: v.optional(v.any()),       // { milestoneId: string }
+    updatedAt: v.number(),
+  }).index("by_mentor_id", ["mentorId"]),
 
   // ── Payments ─────────────────────────────────────────────
   payments: defineTable({

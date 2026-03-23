@@ -6,6 +6,9 @@
     "web",
     "mobile"
   ],
+  "dependencies": {
+    "convex": "^1.17.0"
+  },
   "scripts": {
     "web": "npm run dev --workspace=web",
     "mobile": "npm run start --workspace=mobile"

@@ -8,7 +8,7 @@ export function Card({ compact = false, className = "", children, ...props }: Ca
   return (
     <div
       className={[
-        "bg-white border border-slate-200 rounded-lg shadow-sm",
+        "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg shadow-sm",
         compact ? "p-4" : "p-6",
         className,
       ].join(" ")}
