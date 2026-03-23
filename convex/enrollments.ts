@@ -199,6 +199,32 @@ export const listMentorStudents = query({
   },
 });
 
+// Fetch data needed to send sale notification emails (called from webhook via HTTP client)
+export const getEnrollmentEmailData = query({
+  args: {
+    mentorId: v.id("mentors"),
+    courseId: v.id("courses"),
+    learnerId: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const mentor = await ctx.db.get(args.mentorId);
+    if (!mentor) return null;
+    const mentorUser = await ctx.db.get(mentor.userId);
+    const course = await ctx.db.get(args.courseId);
+    const learner = await ctx.db.get(args.learnerId);
+    return {
+      mentorEmail: mentorUser?.email ?? null,
+      mentorName: mentor.name,
+      courseTitle: course?.title ?? "your course",
+      courseSlug: course?.slug ?? "",
+      mentorSlug: mentor.slug,
+      learnerName: learner?.name ?? "A new student",
+      learnerEmail: learner?.email ?? null,
+      priceCents: course?.priceCents ?? 0,
+    };
+  },
+});
+
 // Get all enrollments for a learner
 export const listMyEnrollments = query({
   args: {},
