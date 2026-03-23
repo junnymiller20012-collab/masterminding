@@ -23,8 +23,8 @@ export default function ConnectStripePage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-start justify-center pt-16 px-4">
-      <div className="w-full max-w-md bg-white rounded-xl border border-slate-200 shadow-sm p-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-start justify-center pt-16 px-4">
+      <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-8">
         {/* Step indicator */}
         <div className="flex items-center gap-2 mb-8">
           {[1, 2, 3].map((step) => (
@@ -44,10 +44,10 @@ export default function ConnectStripePage() {
           ))}
         </div>
 
-        <h1 className="text-xl font-bold text-slate-900 mb-2">
+        <h1 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
           Connect your bank account
         </h1>
-        <p className="text-slate-500 text-sm mb-6">
+        <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">
           We use Stripe to send you payouts automatically. Your banking info is
           secured by Stripe — we never see your account details.
         </p>
@@ -58,8 +58,8 @@ export default function ConnectStripePage() {
             { icon: Zap, text: "Payouts sent within 2 business days" },
             { icon: Shield, text: "Bank-level security via Stripe" },
           ].map(({ icon: Icon, text }) => (
-            <div key={text} className="flex items-center gap-3 text-sm text-slate-700">
-              <div className="w-8 h-8 rounded-lg bg-teal-50 flex items-center justify-center shrink-0">
+            <div key={text} className="flex items-center gap-3 text-sm text-slate-700 dark:text-slate-300">
+              <div className="w-8 h-8 rounded-lg bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center shrink-0">
                 <Icon className="w-4 h-4 text-[#0F766E]" />
               </div>
               {text}

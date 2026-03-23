@@ -31,8 +31,8 @@ export default function SubscribePage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-start justify-center pt-16 px-4">
-      <div className="w-full max-w-md bg-white rounded-xl border border-slate-200 shadow-sm p-8">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-start justify-center pt-16 px-4">
+      <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-8">
         {/* Step indicator */}
         <div className="flex items-center gap-2 mb-8">
           {[1, 2, 3].map((step) => (
@@ -42,32 +42,32 @@ export default function SubscribePage() {
                   "w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold",
                   step <= 2
                     ? "bg-[#0F766E] text-white"
-                    : "bg-slate-100 text-slate-400",
+                    : "bg-slate-100 dark:bg-slate-800 text-slate-400",
                 ].join(" ")}
               >
                 {step === 1 ? "✓" : step}
               </div>
-              {step < 3 && <div className="w-12 h-px bg-slate-200" />}
+              {step < 3 && <div className="w-12 h-px bg-slate-200 dark:bg-slate-700" />}
             </div>
           ))}
         </div>
 
         <div className="text-center mb-6">
-          <p className="text-sm text-slate-500 uppercase tracking-wide font-medium mb-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 uppercase tracking-wide font-medium mb-1">
             MasterMinding Platform
           </p>
-          <div className="text-4xl font-bold text-slate-900">
+          <div className="text-4xl font-bold text-slate-900 dark:text-white">
             $29
-            <span className="text-lg font-normal text-slate-500">/month</span>
+            <span className="text-lg font-normal text-slate-500 dark:text-slate-400">/month</span>
           </div>
-          <p className="text-slate-500 text-sm mt-1">
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
             + 10% per course sale — you keep the rest
           </p>
         </div>
 
         <ul className="space-y-3 mb-8">
           {benefits.map((b) => (
-            <li key={b} className="flex items-center gap-3 text-sm text-slate-700">
+            <li key={b} className="flex items-center gap-3 text-sm text-slate-700 dark:text-slate-300">
               <CheckCircle className="w-4 h-4 text-[#0F766E] shrink-0" />
               {b}
             </li>

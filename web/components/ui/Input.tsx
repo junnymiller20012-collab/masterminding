@@ -15,7 +15,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="text-sm font-medium text-slate-700"
+            className="text-sm font-medium text-slate-700 dark:text-slate-300"
           >
             {label}
           </label>
@@ -24,14 +24,14 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           id={inputId}
           className={[
-            "h-10 px-3 rounded-lg border text-sm text-slate-900 bg-white",
+            "h-10 px-3 rounded-lg border text-sm text-slate-900 dark:text-white bg-white dark:bg-slate-800",
             "placeholder:text-slate-400",
             "transition-colors duration-150",
-            "focus:outline-none focus:ring-2 focus:ring-[#0F766E] focus:ring-offset-2",
+            "focus:outline-none focus:ring-2 focus:ring-[#0F766E] focus:ring-offset-2 dark:focus:ring-offset-slate-900",
             error
               ? "border-red-500 focus:ring-red-500"
-              : "border-slate-200 hover:border-slate-300",
-            "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-50",
+              : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600",
+            "disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-50 dark:disabled:bg-slate-800",
             className,
           ].join(" ")}
           {...props}
