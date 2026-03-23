@@ -1,6 +1,7 @@
 import { CheckCircle, BookOpen } from "lucide-react";
 import type { Id } from "@convex/_generated/dataModel";
 import { EnrollButton } from "./EnrollButton";
+import { ReviewSection } from "./ReviewSection";
 import Link from "next/link";
 
 interface Course {
@@ -164,6 +165,9 @@ export function CourseSalesPage({ course, mentor, sections, otherCourses = [], m
             </div>
           </div>
         )}
+
+        {/* Reviews */}
+        <ReviewSection courseId={course._id} />
 
         {/* CTA */}
         <div className="bg-teal-50 border border-teal-100 rounded-xl p-8 text-center">

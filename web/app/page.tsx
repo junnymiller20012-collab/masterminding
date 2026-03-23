@@ -25,6 +25,9 @@ export default async function HomePage() {
           >
             Sign in
           </Link>
+          <Link href="/explore" className="hidden sm:block text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors px-2 py-1.5">
+            Browse courses
+          </Link>
           <Link
             href="/sign-up"
             className="text-sm font-medium bg-[#0F766E] text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-[#0D6D65] transition-colors whitespace-nowrap"
@@ -69,6 +72,12 @@ export default async function HomePage() {
         </div>
 
         <p className="text-xs text-slate-400 mt-4">No credit card required to start</p>
+        <p className="text-xs text-slate-400 mt-2">
+          or{" "}
+          <Link href="/explore" className="text-teal-600 hover:underline">
+            browse existing courses →
+          </Link>
+        </p>
       </main>
 
       {/* Features */}

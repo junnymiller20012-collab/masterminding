@@ -153,6 +153,34 @@ export default defineSchema({
     updatedAt: v.number(),
   }).index("by_mentor_id", ["mentorId"]),
 
+  // ── Reviews ──────────────────────────────────────────────
+  reviews: defineTable({
+    enrollmentId: v.id("enrollments"),
+    learnerId: v.id("users"),
+    courseId: v.id("courses"),
+    rating: v.number(), // 1-5
+    body: v.optional(v.string()),
+    createdAt: v.number(),
+  })
+    .index("by_course_id", ["courseId"])
+    .index("by_learner_course", ["learnerId", "courseId"]),
+
+  // ── Affiliates ───────────────────────────────────────────
+  affiliates: defineTable({
+    mentorId: v.id("mentors"),
+    courseId: v.id("courses"),
+    affiliateUserId: v.id("users"),
+    referralCode: v.string(),
+    commissionPercent: v.number(), // e.g. 20 = 20%
+    totalReferrals: v.number(),
+    totalEarnedCents: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_mentor_id", ["mentorId"])
+    .index("by_course_id", ["courseId"])
+    .index("by_referral_code", ["referralCode"])
+    .index("by_affiliate_user", ["affiliateUserId"]),
+
   // ── Payments ─────────────────────────────────────────────
   payments: defineTable({
     enrollmentId: v.optional(v.id("enrollments")),

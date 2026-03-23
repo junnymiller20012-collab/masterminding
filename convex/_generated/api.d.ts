@@ -8,11 +8,13 @@
  * @module
  */
 
+import type * as affiliates from "../affiliates.js";
 import type * as courses from "../courses.js";
 import type * as enrollments from "../enrollments.js";
 import type * as mentors from "../mentors.js";
 import type * as milestones from "../milestones.js";
 import type * as progress from "../progress.js";
+import type * as reviews from "../reviews.js";
 import type * as sections from "../sections.js";
 import type * as users from "../users.js";
 
@@ -23,11 +25,13 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  affiliates: typeof affiliates;
   courses: typeof courses;
   enrollments: typeof enrollments;
   mentors: typeof mentors;
   milestones: typeof milestones;
   progress: typeof progress;
+  reviews: typeof reviews;
   sections: typeof sections;
   users: typeof users;
 }>;

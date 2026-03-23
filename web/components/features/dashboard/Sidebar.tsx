@@ -14,6 +14,7 @@ import {
   Moon,
   TrendingUp,
   X,
+  Link2,
 } from "lucide-react";
 import { useSidebar } from "./SidebarContext";
 
@@ -22,6 +23,7 @@ const navItems = [
   { href: "/courses", label: "Courses", icon: BookOpen },
   { href: "/students", label: "Students", icon: Users },
   { href: "/growth", label: "Growth", icon: TrendingUp },
+  { href: "/affiliates", label: "Affiliates", icon: Link2 },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 

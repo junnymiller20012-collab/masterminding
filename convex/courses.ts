@@ -294,3 +294,39 @@ export const listByMentor = query({
       .collect();
   },
 });
+
+export const listPublished = query({
+  args: {
+    search: v.optional(v.string()),
+    sortBy: v.optional(v.union(v.literal("newest"), v.literal("popular"), v.literal("price_asc"), v.literal("price_desc"))),
+  },
+  handler: async (ctx, args) => {
+    let courses = await ctx.db
+      .query("courses")
+      .withIndex("by_status", (q) => q.eq("status", "published"))
+      .collect();
+
+    if (args.search) {
+      const s = args.search.toLowerCase();
+      courses = courses.filter(
+        (c) => c.title.toLowerCase().includes(s) || c.description.toLowerCase().includes(s)
+      );
+    }
+
+    const withMentors = await Promise.all(
+      courses.map(async (c) => {
+        const mentor = await ctx.db.get(c.mentorId);
+        return { ...c, mentorName: mentor?.name ?? "", mentorSlug: mentor?.slug ?? "", mentorAvatarUrl: mentor?.avatarUrl };
+      })
+    );
+
+    const sorted = withMentors.sort((a, b) => {
+      if (args.sortBy === "popular") return b.enrollmentCount - a.enrollmentCount;
+      if (args.sortBy === "price_asc") return a.priceCents - b.priceCents;
+      if (args.sortBy === "price_desc") return b.priceCents - a.priceCents;
+      return b.createdAt - a.createdAt; // newest
+    });
+
+    return sorted.slice(0, 48);
+  },
+});
