@@ -3,9 +3,26 @@ import { api } from "@convex/_generated/api";
 import Link from "next/link";
 import { BookOpen, Users, Star } from "lucide-react";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 
 interface Props {
   params: Promise<{ mentorSlug: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { mentorSlug } = await params;
+  const data = await fetchQuery(api.mentors.getBySlug, { slug: mentorSlug });
+  if (!data) return { title: "Mentor Not Found" };
+  const { mentor } = data;
+  return {
+    title: mentor.name,
+    description: mentor.bio?.slice(0, 160) ?? `Courses by ${mentor.name} — ${mentor.expertise}`,
+    openGraph: {
+      title: `${mentor.name} — ${mentor.expertise}`,
+      description: mentor.bio?.slice(0, 160) ?? `Courses by ${mentor.name}`,
+      ...(mentor.avatarUrl ? { images: [{ url: mentor.avatarUrl }] } : {}),
+    },
+  };
 }
 
 export default async function MentorStorefrontPage({ params }: Props) {

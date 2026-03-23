@@ -7,6 +7,7 @@ import { api } from "@convex/_generated/api";
 import { CourseDetailsForm, CourseDetailsValues } from "@/components/features/courses/CourseDetailsForm";
 import { SectionManager, SectionDraft } from "@/components/features/courses/SectionManager";
 import { PricingStep } from "@/components/features/courses/PricingStep";
+import { toast } from "sonner";
 
 const STEPS = ["Course Details", "Add Content", "Pricing"];
 
@@ -59,8 +60,9 @@ export default function NewCoursePage() {
       }
 
       router.push(`/courses/${courseId}/sales-page`);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      toast.error(err?.message ?? "Failed to create course. Please try again.");
       setIsGenerating(false);
     }
   }

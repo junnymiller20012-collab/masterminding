@@ -6,6 +6,7 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import type { Id } from "@convex/_generated/dataModel";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface Props {
   courseId: Id<"courses">;
@@ -46,7 +47,9 @@ export function EnrollButton({ courseId, priceCents }: Props) {
       const url = await createCheckout({ courseId });
       window.location.href = url;
     } catch (err: any) {
-      setError(err.message ?? "Something went wrong");
+      const message = err?.message ?? "Something went wrong. Please try again.";
+      setError(message);
+      toast.error(message);
       setLoading(false);
     }
   }

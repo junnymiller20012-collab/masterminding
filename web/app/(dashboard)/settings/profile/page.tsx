@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import { Save, User, ExternalLink } from "lucide-react";
+import { toast } from "sonner";
 
 const schema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -42,15 +43,20 @@ export default function SettingsProfilePage() {
   }, [mentor, initialized, reset]);
 
   async function onSubmit(values: FormValues) {
-    await updateProfile({
-      name: values.name,
-      bio: values.bio,
-      expertise: values.expertise,
-      avatarUrl: values.avatarUrl || undefined,
-    });
-    setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
-    reset(values);
+    try {
+      await updateProfile({
+        name: values.name,
+        bio: values.bio,
+        expertise: values.expertise,
+        avatarUrl: values.avatarUrl || undefined,
+      });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+      reset(values);
+      toast.success("Profile saved successfully!");
+    } catch (err: any) {
+      toast.error(err?.message ?? "Failed to save profile. Please try again.");
+    }
   }
 
   if (mentor === undefined) {

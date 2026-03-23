@@ -23,8 +23,20 @@ export default function CoursesPage() {
       </div>
 
       {courses === undefined ? (
-        <div className="flex justify-center py-20">
-          <div className="w-8 h-8 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden animate-pulse">
+              <div className="h-36 bg-slate-200 dark:bg-slate-700" />
+              <div className="p-5 space-y-3">
+                <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-3/4" />
+                <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/2" />
+                <div className="flex items-center justify-between pt-2">
+                  <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/4" />
+                  <div className="h-5 bg-slate-200 dark:bg-slate-700 rounded w-1/5" />
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       ) : courses.length === 0 ? (
         <div className="text-center py-20 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl">

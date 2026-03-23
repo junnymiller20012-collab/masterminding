@@ -30,7 +30,25 @@ export default function DashboardPage() {
         {!mentor?.subscriptionStatus && mentor && (
           <SubscriptionBanner status="inactive" />
         )}
-        {isNew || !mentor ? (
+        {stats === undefined || mentor === undefined ? (
+          /* Loading skeleton */
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 animate-pulse">
+                  <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/2 mb-3" />
+                  <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded w-2/3" />
+                </div>
+              ))}
+            </div>
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 animate-pulse space-y-3">
+              <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/4 mb-4" />
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-10 bg-slate-100 dark:bg-slate-800 rounded" />
+              ))}
+            </div>
+          </>
+        ) : isNew || !mentor ? (
           <EmptyState name={user?.firstName ?? undefined} />
         ) : (
           <>
