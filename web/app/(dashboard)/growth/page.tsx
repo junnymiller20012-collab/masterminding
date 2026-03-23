@@ -64,10 +64,18 @@ export default function GrowthPage() {
     }
   }
 
-  if (!data || !courses) {
+  if (data === undefined || courses === undefined) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="w-8 h-8 border-4 border-teal-200 border-t-teal-600 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (data === null || courses === null) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-slate-500 dark:text-slate-400 text-sm">Please complete <a href="/onboarding/profile" className="text-teal-600 underline">onboarding</a> to view your growth milestones.</p>
       </div>
     );
   }
