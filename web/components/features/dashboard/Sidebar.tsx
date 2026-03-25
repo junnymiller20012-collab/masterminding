@@ -15,23 +15,29 @@ import {
   TrendingUp,
   X,
   Link2,
+  Compass,
+  BookMarked,
 } from "lucide-react";
 import { useSidebar } from "./SidebarContext";
-
-const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/courses", label: "Courses", icon: BookOpen },
-  { href: "/students", label: "Students", icon: Users },
-  { href: "/growth", label: "Growth", icon: TrendingUp },
-  { href: "/affiliates", label: "Affiliates", icon: Link2 },
-  { href: "/settings", label: "Settings", icon: Settings },
-];
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export function Sidebar() {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const { open, close } = useSidebar();
+  const { lang, setLang, t } = useLanguage();
+
+  const navItems = [
+    { href: "/dashboard", label: t.navDashboard, icon: LayoutDashboard },
+    { href: "/courses", label: t.navCourses, icon: BookOpen },
+    { href: "/students", label: t.navStudents, icon: Users },
+    { href: "/growth", label: t.navGrowth, icon: TrendingUp },
+    { href: "/affiliates", label: t.navAffiliates, icon: Link2 },
+    { href: "/explore", label: t.navExplore, icon: Compass },
+    { href: "/my-learning", label: t.navMyLearning, icon: BookMarked },
+    { href: "/settings", label: t.navSettings, icon: Settings },
+  ];
 
   useEffect(() => setMounted(true), []);
 
@@ -95,15 +101,22 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Dark mode toggle */}
+      {/* Dark mode + Language toggles */}
       {mounted && (
-        <div className="px-3 pb-4">
+        <div className="px-3 pb-4 space-y-1">
           <button
             onClick={() => setTheme(isDark ? "light" : "dark")}
             className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors"
           >
             {isDark ? <Sun className="w-4 h-4 shrink-0" /> : <Moon className="w-4 h-4 shrink-0" />}
-            {isDark ? "Light mode" : "Dark mode"}
+            {isDark ? t.lightMode : t.darkMode}
+          </button>
+          <button
+            onClick={() => setLang(lang === "en" ? "es" : "en")}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors"
+          >
+            <span className="w-4 h-4 shrink-0 text-base leading-none">{lang === "en" ? "🇪🇸" : "🇺🇸"}</span>
+            {lang === "en" ? t.switchToSpanish : t.switchToEnglish}
           </button>
         </div>
       )}
