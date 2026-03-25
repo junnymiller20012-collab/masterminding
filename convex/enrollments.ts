@@ -15,7 +15,10 @@ async function getAuthenticatedUser(ctx: any) {
 
 // Create a Stripe Checkout session for a course purchase
 export const createCheckoutSession = action({
-  args: { courseId: v.id("courses") },
+  args: {
+    courseId: v.id("courses"),
+    couponCode: v.optional(v.string()),
+  },
   handler: async (ctx, args): Promise<string> => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Unauthorized");
@@ -36,6 +39,23 @@ export const createCheckoutSession = action({
     const mentor = await ctx.runQuery(api.mentors.getById, { mentorId: course.mentorId });
     if (!mentor) throw new Error("Mentor not found");
 
+    // Apply coupon discount if provided
+    let finalPriceCents = course.priceCents;
+    let appliedCouponCode: string | undefined;
+    if (args.couponCode && course.priceCents > 0) {
+      const coupon = await ctx.runQuery(api.coupons.validate, {
+        code: args.couponCode,
+        courseId: args.courseId,
+      });
+      if (coupon) {
+        finalPriceCents = Math.max(
+          50, // Stripe minimum $0.50
+          Math.round(course.priceCents * (1 - coupon.discountPercent / 100))
+        );
+        appliedCouponCode = coupon.code;
+      }
+    }
+
     const stripeKey = process.env.STRIPE_SECRET_KEY;
     if (!stripeKey) throw new Error("Stripe not configured");
 
@@ -50,7 +70,7 @@ export const createCheckoutSession = action({
         {
           price_data: {
             currency: course.currency,
-            unit_amount: course.priceCents,
+            unit_amount: finalPriceCents,
             product_data: { name: course.title },
           },
           quantity: 1,
@@ -60,13 +80,14 @@ export const createCheckoutSession = action({
         courseId: args.courseId,
         learnerId: user._id,
         mentorId: course.mentorId,
+        couponCode: appliedCouponCode ?? "",
       },
       success_url: `${appUrl}/learn/${args.courseId}?enrolled=1`,
       cancel_url: `${appUrl}/${mentor.slug}/${course.slug}`,
       ...(mentor.stripeAccountId && mentor.stripeAccountStatus === "active"
         ? {
             payment_intent_data: {
-              application_fee_amount: Math.round(course.priceCents * 0.1),
+              application_fee_amount: Math.round(finalPriceCents * 0.1),
               transfer_data: { destination: mentor.stripeAccountId },
             },
           }
@@ -74,6 +95,48 @@ export const createCheckoutSession = action({
     });
 
     return session.url!;
+  },
+});
+
+// Direct enrollment for free courses (no Stripe)
+export const enrollFree = mutation({
+  args: { courseId: v.id("courses") },
+  handler: async (ctx, args) => {
+    const user = await getAuthenticatedUser(ctx);
+
+    const course = await ctx.db.get(args.courseId);
+    if (!course) throw new Error("Course not found");
+    if (course.status !== "published") throw new Error("Course is not available");
+    if (course.priceCents !== 0) throw new Error("Course is not free");
+
+    const existing = await ctx.db
+      .query("enrollments")
+      .withIndex("by_learner_course", (q: any) =>
+        q.eq("learnerId", user._id).eq("courseId", args.courseId)
+      )
+      .unique();
+    if (existing) return existing._id;
+
+    const now = Date.now();
+    const enrollmentId = await ctx.db.insert("enrollments", {
+      courseId: args.courseId,
+      learnerId: user._id,
+      mentorId: course.mentorId,
+      amountPaidCents: 0,
+      currency: course.currency,
+      stripePaymentIntentId: "free",
+      status: "active",
+      enrolledAt: now,
+      updatedAt: now,
+    });
+
+    await ctx.db.patch(args.courseId, {
+      enrollmentCount: course.enrollmentCount + 1,
+      totalRevenueCents: course.totalRevenueCents,
+      updatedAt: now,
+    });
+
+    return enrollmentId;
   },
 });
 
@@ -236,9 +299,35 @@ export const listMyEnrollments = query({
       .withIndex("by_clerk_id", (q: any) => q.eq("clerkId", identity.subject))
       .unique();
     if (!user) return [];
-    return await ctx.db
+
+    const enrollments = await ctx.db
       .query("enrollments")
       .withIndex("by_learner_id", (q: any) => q.eq("learnerId", user._id))
       .collect();
+
+    return await Promise.all(
+      enrollments.map(async (e) => {
+        const course = await ctx.db.get(e.courseId);
+        const sections = await ctx.db
+          .query("sections")
+          .withIndex("by_course_id", (q: any) => q.eq("courseId", e.courseId))
+          .collect();
+        const progress = await ctx.db
+          .query("progress")
+          .withIndex("by_learner_course", (q: any) =>
+            q.eq("learnerId", user._id).eq("courseId", e.courseId)
+          )
+          .unique();
+        const mentor = course ? await ctx.db.get(course.mentorId) : null;
+        return {
+          ...e,
+          courseTitle: course?.title ?? "Unknown Course",
+          coverImageUrl: course?.coverImageUrl ?? null,
+          mentorName: mentor?.name ?? "",
+          totalSections: sections.length,
+          completedCount: progress?.completedLessons.length ?? 0,
+        };
+      })
+    );
   },
 });
