@@ -98,8 +98,8 @@ export const createCheckoutSession = action({
   },
 });
 
-// Direct enrollment for free courses (no Stripe)
-export const enrollFree = mutation({
+// Internal mutation used by enrollFree action
+export const insertFreeEnrollment = mutation({
   args: { courseId: v.id("courses") },
   handler: async (ctx, args) => {
     const user = await getAuthenticatedUser(ctx);
@@ -115,7 +115,7 @@ export const enrollFree = mutation({
         q.eq("learnerId", user._id).eq("courseId", args.courseId)
       )
       .unique();
-    if (existing) return existing._id;
+    if (existing) return { enrollmentId: existing._id, alreadyEnrolled: true };
 
     const now = Date.now();
     const enrollmentId = await ctx.db.insert("enrollments", {
@@ -136,7 +136,95 @@ export const enrollFree = mutation({
       updatedAt: now,
     });
 
-    return enrollmentId;
+    return { enrollmentId, alreadyEnrolled: false };
+  },
+});
+
+// Direct enrollment for free courses — also sends email notifications
+export const enrollFree = action({
+  args: { courseId: v.id("courses") },
+  handler: async (ctx, args) => {
+    const result = await ctx.runMutation(api.enrollments.insertFreeEnrollment, {
+      courseId: args.courseId,
+    });
+
+    if (result.alreadyEnrolled) return result.enrollmentId;
+
+    // Send notification emails
+    try {
+      const emailData = await ctx.runQuery(api.enrollments.getEnrollmentEmailData, {
+        mentorId: (await ctx.runQuery(api.courses.getById, { courseId: args.courseId }))!.mentorId,
+        courseId: args.courseId,
+        learnerId: (await ctx.runQuery(api.users.getMe))!._id,
+      });
+
+      if (emailData) {
+        const resendKey = process.env.RESEND_API_KEY;
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.masterminding.app";
+        const fromEmail = process.env.RESEND_FROM_EMAIL ?? "notifications@masterminding.app";
+
+        if (resendKey) {
+          const { Resend } = await import("resend");
+          const resend = new Resend(resendKey);
+
+          // Email to mentor
+          if (emailData.mentorEmail) {
+            await resend.emails.send({
+              from: `MasterMinding <${fromEmail}>`,
+              to: emailData.mentorEmail,
+              subject: `New free enrollment! ${emailData.learnerName} just enrolled in "${emailData.courseTitle}"`,
+              html: `
+                <div style="font-family:sans-serif;max-width:520px;margin:0 auto;color:#1e293b">
+                  <div style="background:#0F766E;padding:24px 32px;border-radius:12px 12px 0 0">
+                    <h1 style="color:white;margin:0;font-size:22px">New student enrolled! 🎓</h1>
+                  </div>
+                  <div style="background:#f8fafc;padding:32px;border-radius:0 0 12px 12px;border:1px solid #e2e8f0;border-top:none">
+                    <p style="margin:0 0 20px;font-size:16px">
+                      <strong>${emailData.learnerName}</strong> just enrolled in
+                      <strong>"${emailData.courseTitle}"</strong> for free.
+                    </p>
+                    <a href="${appUrl}/students" style="background:#0F766E;color:white;text-decoration:none;padding:12px 24px;border-radius:8px;font-weight:600;display:inline-block;font-size:14px">
+                      View Students →
+                    </a>
+                  </div>
+                </div>
+              `,
+            });
+          }
+
+          // Email to student
+          const user = await ctx.runQuery(api.users.getMe);
+          const learnerEmail = user?.email;
+          if (learnerEmail) {
+            await resend.emails.send({
+              from: `MasterMinding <${fromEmail}>`,
+              to: learnerEmail,
+              subject: `You're enrolled in "${emailData.courseTitle}"! Here's your access link`,
+              html: `
+                <div style="font-family:sans-serif;max-width:520px;margin:0 auto;color:#1e293b">
+                  <div style="background:#0F766E;padding:24px 32px;border-radius:12px 12px 0 0">
+                    <h1 style="color:white;margin:0;font-size:22px">Welcome to the course! 🎓</h1>
+                  </div>
+                  <div style="background:#f8fafc;padding:32px;border-radius:0 0 12px 12px;border:1px solid #e2e8f0;border-top:none">
+                    <p style="margin:0 0 20px;font-size:16px">
+                      Hi ${emailData.learnerName}, you're now enrolled in <strong>"${emailData.courseTitle}"</strong> by ${emailData.mentorName}. You have lifetime access.
+                    </p>
+                    <a href="${appUrl}/learn/${args.courseId}" style="background:#0F766E;color:white;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:600;display:inline-block;font-size:15px;margin-bottom:24px">
+                      Start Learning Now →
+                    </a>
+                  </div>
+                </div>
+              `,
+            });
+          }
+        }
+      }
+    } catch (e) {
+      // Email failure should not block enrollment
+      console.error("Failed to send enrollment email:", e);
+    }
+
+    return result.enrollmentId;
   },
 });
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useUser, useClerk } from "@clerk/nextjs";
-import { useAction, useMutation, useQuery } from "convex/react";
+import { useAction, useQuery } from "convex/react";
 import { api } from "@convex/_generated/api";
 import type { Id } from "@convex/_generated/dataModel";
 import { useRouter } from "next/navigation";
@@ -26,7 +26,7 @@ export function EnrollButton({ courseId, priceCents }: Props) {
 
   const enrollment = useQuery(api.enrollments.checkEnrollment, isSignedIn ? { courseId } : "skip");
   const createCheckout = useAction(api.enrollments.createCheckoutSession);
-  const enrollFree = useMutation(api.enrollments.enrollFree);
+  const enrollFree = useAction(api.enrollments.enrollFree);
   const couponResult = useQuery(
     api.coupons.validate,
     appliedCode ? { code: appliedCode, courseId } : "skip"
