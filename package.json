@@ -12,5 +12,8 @@
   "scripts": {
     "web": "npm run dev --workspace=web",
     "mobile": "npm run start --workspace=mobile"
+  },
+  "overrides": {
+    "react-native-worklets": "0.7.2"
   }
 }
