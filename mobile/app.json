@@ -52,7 +52,8 @@
           }
         }
       ],
-      "./plugins/withKotlinOptIn"
+      "./plugins/withKotlinOptIn",
+      "expo-web-browser"
     ],
     "extra": {
       "eas": {
