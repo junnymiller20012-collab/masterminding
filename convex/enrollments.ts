@@ -13,7 +13,7 @@ async function getAuthenticatedUser(ctx: any) {
   return user;
 }
 
-// Create a Stripe Checkout session for a course purchase
+// Create a Lemon Squeezy Checkout session for a course purchase
 export const createCheckoutSession = action({
   args: {
     courseId: v.id("courses"),
@@ -49,52 +49,60 @@ export const createCheckoutSession = action({
       });
       if (coupon) {
         finalPriceCents = Math.max(
-          50, // Stripe minimum $0.50
+          100, // Lemon Squeezy minimum $1.00
           Math.round(course.priceCents * (1 - coupon.discountPercent / 100))
         );
         appliedCouponCode = coupon.code;
       }
     }
 
-    const stripeKey = process.env.STRIPE_SECRET_KEY;
-    if (!stripeKey) throw new Error("Stripe not configured");
-
-    const Stripe = (await import("stripe")).default;
-    const stripe = new Stripe(stripeKey);
+    const lsApiKey = process.env.LEMONSQUEEZY_API_KEY;
+    const lsVariantId = process.env.LEMONSQUEEZY_VARIANT_ID;
+    const lsStoreId = process.env.LEMONSQUEEZY_STORE_ID;
+    if (!lsApiKey || !lsVariantId || !lsStoreId) throw new Error("Lemon Squeezy not configured");
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      payment_method_types: ["card"],
-      line_items: [
-        {
-          price_data: {
-            currency: course.currency,
-            unit_amount: finalPriceCents,
-            product_data: { name: course.title },
-          },
-          quantity: 1,
-        },
-      ],
-      metadata: {
-        courseId: args.courseId,
-        learnerId: user._id,
-        mentorId: course.mentorId,
-        couponCode: appliedCouponCode ?? "",
+
+    const response = await fetch("https://api.lemonsqueezy.com/v1/checkouts", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${lsApiKey}`,
+        "Content-Type": "application/vnd.api+json",
+        Accept: "application/vnd.api+json",
       },
-      success_url: `${appUrl}/learn/${args.courseId}?enrolled=1`,
-      cancel_url: `${appUrl}/${mentor.slug}/${course.slug}`,
-      ...(mentor.stripeAccountId && mentor.stripeAccountStatus === "active"
-        ? {
-            payment_intent_data: {
-              application_fee_amount: Math.round(finalPriceCents * 0.1),
-              transfer_data: { destination: mentor.stripeAccountId },
+      body: JSON.stringify({
+        data: {
+          type: "checkouts",
+          attributes: {
+            custom_price: finalPriceCents,
+            product_options: {
+              name: course.title,
+              redirect_url: `${appUrl}/learn/${args.courseId}?enrolled=1`,
             },
-          }
-        : {}),
+            checkout_data: {
+              custom: {
+                courseId: args.courseId,
+                learnerId: user._id,
+                mentorId: course.mentorId,
+                couponCode: appliedCouponCode ?? "",
+              },
+            },
+          },
+          relationships: {
+            store: { data: { type: "stores", id: lsStoreId } },
+            variant: { data: { type: "variants", id: lsVariantId } },
+          },
+        },
+      }),
     });
 
-    return session.url!;
+    if (!response.ok) {
+      const err = await response.text();
+      throw new Error(`Lemon Squeezy checkout failed: ${err}`);
+    }
+
+    const json = await response.json();
+    return json.data.attributes.url;
   },
 });
 
