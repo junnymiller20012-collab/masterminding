@@ -52,6 +52,26 @@ export const createProfile = mutation({
   },
 });
 
+// Save an uploaded avatar (storageId → URL)
+export const saveAvatar = mutation({
+  args: { storageId: v.string() },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Unauthorized");
+    const mentor = await ctx.db
+      .query("mentors")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .unique();
+    if (!mentor) throw new Error("Mentor not found");
+    const url = await ctx.storage.getUrl(args.storageId);
+    await ctx.db.patch(mentor._id, {
+      avatarStorageId: args.storageId,
+      avatarUrl: url ?? undefined,
+      updatedAt: Date.now(),
+    });
+  },
+});
+
 // Get the authenticated user's mentor profile
 export const getMe = query({
   args: {},
@@ -132,6 +152,36 @@ export const getDashboard = query({
       )
       .collect();
 
+    // Overall completion rate across all enrollments
+    const coursesSectionCount: Record<string, number> = {};
+    let completedCount = 0;
+    await Promise.all(
+      enrollments.map(async (e) => {
+        const courseId = e.courseId.toString();
+        if (!(courseId in coursesSectionCount)) {
+          const sections = await ctx.db
+            .query("sections")
+            .withIndex("by_course_id", (q) => q.eq("courseId", e.courseId))
+            .collect();
+          coursesSectionCount[courseId] = sections.length;
+        }
+        const sectionCount = coursesSectionCount[courseId] ?? 0;
+        if (sectionCount === 0) return;
+        const progress = await ctx.db
+          .query("progress")
+          .withIndex("by_learner_course", (q) =>
+            q.eq("learnerId", e.learnerId).eq("courseId", e.courseId)
+          )
+          .unique();
+        const completed = progress?.completedLessons.length ?? 0;
+        if (completed >= sectionCount) completedCount++;
+      })
+    );
+    const overallCompletionRate =
+      enrollments.length > 0
+        ? Math.round((completedCount / enrollments.length) * 100)
+        : 0;
+
     // Recent enrollments (last 10)
     const recent = enrollments
       .sort((a, b) => b.enrolledAt - a.enrolledAt)
@@ -155,6 +205,7 @@ export const getDashboard = query({
       totalEnrollments,
       totalRevenueCents,
       publishedCourseCount: publishedCourses.length,
+      overallCompletionRate,
       recentEnrollments,
     };
   },
